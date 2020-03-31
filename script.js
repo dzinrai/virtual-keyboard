@@ -24,12 +24,14 @@ class Button {
         this.inputTypeValue = true;
         this.domElement.classList.add('keyboard__button');
         this.domElement.classList.add('button__'.concat(name.toLowerCase()));
+        this.domElement.setAttribute('id', name);
         this.addToKeyboard(keyboard);
-        // currRow.appendChild(this.domElement);
-        if (name === 'Enter' || name === 'Delete' || name === 'Backspace' || name === 'Tab' || name === 'ControlLeft' || name === 'ControlRight' || name === 'ShiftLeft' || name === 'ShiftRight' || name === 'AltLeft' || name === 'AltRight' || name === 'ArrowUp' || name === 'ArrowLeft' || name === 'ArrowRight' || name === 'ArrowDown' || name === 'CapsLock' || name === 'OSLeft') {
+        if (name === 'Delete' || name === 'Backspace' || name === 'Tab' || name === 'ControlLeft' || name === 'ControlRight' || name === 'ShiftLeft' || name === 'ShiftRight' || name === 'AltLeft' || name === 'AltRight' || name === 'ArrowUp' || name === 'ArrowLeft' || name === 'ArrowRight' || name === 'ArrowDown' || name === 'CapsLock' || name === 'OSLeft') {
             this.inputTypeValue = false;
         } else if (name === 'Space') {
             this.value = ' ';
+        } else if (name === 'Enter') {
+            this.value = '\n';
         }
     }
 
@@ -47,15 +49,14 @@ class Button {
     }
 }
 
-// ~
+// Creating buttons
 btns.Backquote = new Button('Backquote', '~');
-// digits
 for (let i = 1; i <= 10; i += 1) {
+    // digits
     const num = i < 10 ? i : 0;
     const btn = 'Digit'.concat(num);
     btns[btn] = new Button(btn, num);
 }
-// Creating buttons
 btns.Minus = new Button('Minus', '-');
 btns.Equal = new Button('Equal', '=');
 btns.Backspace = new Button('Backspace', 'Backspace');

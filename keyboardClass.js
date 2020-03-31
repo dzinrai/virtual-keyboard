@@ -1,6 +1,5 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable indent */
-
 class Keyboard {
     constructor(lang, langAdd, buttonList, container) {
         this.language = lang;
@@ -16,22 +15,29 @@ class Keyboard {
         }
         const textarea = document.getElementById('textarea');
         this.domElement.addEventListener('click', (event) => {
+            console.log(event.target);
             if (event.target.tagName !== 'BUTTON') return false;
-            if (this.inputTypeValue) {
-                textarea.value += this.value;
-            }
-            triggerKeyboardEvent(document, 'keydown', this.name);
-            setTimeout(() => { triggerKeyboardEvent(document, 'keyup', this.name); }, 100);
-            console.log(`textarea.value=${textarea.value},value=${this.value}`);
+            // console.log(`textarea.value=${textarea.value},value=${this.value}`);
+            this.triggerKeyboardEvent(document, 'keydown', event.target.id);
+            setTimeout(() => { this.triggerKeyboardEvent(document, 'keyup', event.target.id); }, 100);
         });
         document.addEventListener('keydown', (event) => {
             console.log(event);
             console.log(`key=${event.key},code=${event.code}`);
-            if (this.btnList[event.code].inputTypeValue) {
-                event.preventDefault();
+            if (event.code) {
+                if (this.btnList[event.code].inputTypeValue) {
+                    event.preventDefault();
+                    textarea.value += this.btnList[event.code].value;
+                }
+                this.btnList[event.code].addClass('active');
+            } else {
+                if (this.btnList[event.keyCode].inputTypeValue) {
+                    event.preventDefault();
+                    textarea.value += this.btnList[event.keyCode].value;
+                }
+                this.btnList[event.keyCode].addClass('active');
             }
-            if (!event.code) this.btnList[event.keyCode].addClass('active');
-            else this.btnList[event.code].addClass('active');
+
             // console.log(textarea.value);
         });
         document.addEventListener('keyup', (event) => {
@@ -56,19 +62,17 @@ class Keyboard {
         }
         this.numberOfKeysInRow += 1;
     }
-}
-function triggerKeyboardEvent(el, keyState = 'keydown', keyCode) {
-    const eventObj = document.createEventObject ? document.createEventObject() : document.createEvent('Events');
 
-    if (eventObj.initEvent) {
-        eventObj.initEvent(keyState, true, true);
-    }
-
-    eventObj.keyCode = keyCode;
-    eventObj.which = keyCode;
-
-    if (document.dispatchEvent) {
-        document.dispatchEvent(eventObj);
+    triggerKeyboardEvent(el, keyState = 'keydown', keyCode) {
+        this.eventObj = el.createEventObject ? el.createEventObject() : el.createEvent('Events');
+        if (this.eventObj.initEvent) {
+            this.eventObj.initEvent(keyState, true, true);
+        }
+        this.eventObj.keyCode = keyCode;
+        this.eventObj.which = keyCode;
+        if (el.dispatchEvent) {
+            el.dispatchEvent(this.eventObj);
+        }
     }
 }
 
