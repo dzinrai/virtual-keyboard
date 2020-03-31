@@ -1,0 +1,68 @@
+body {
+    background-color: #1c1b1b;
+}
+.textarea {
+    width: 38vw;
+    min-width: 736px;
+    min-height: 200px;
+    display: block;
+    margin: 0 auto 2px;
+    border-radius: 4px;
+}
+.keyboard__container {
+    width: 38vw;
+    min-width: 736px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background-color: #500e6f;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: 20px;
+}
+.keyboard__row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+.keyboard__button {
+    padding: 5px 10px;
+    margin: 3px;
+    border-radius: 5px;
+    border: none;
+    font-size: 20px;
+    outline: none;
+    color: #f2b9b9;
+    background-color: #0d0b0b;
+    cursor: pointer;
+    box-shadow: 0px 0px 3px 1px #dd2424;
+    transition: all 0.3s;
+    flex: 1 0 5%;
+}
+.keyboard__button:active,
+.keyboard__button.active {
+    color: #0d0b0b;
+    background-color: cornsilk;
+    transform: scale(0.9);
+    box-shadow: none;
+    transition: all 0.2s;
+}
+.button__space {
+    flex: 1 0 30%;
+}
+.button__arrowup {
+    /*background: ;*/
+}
+.button__arrowup,
+.button__arrowleft,
+.button__arrowright,
+.button__arrowdown,
+.button__shiftright {
+    flex: 0 1 2%;
+    min-width: 40px;
+    max-width: 40px;
+    font-size: 10px;
+}
