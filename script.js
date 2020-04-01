@@ -118,3 +118,7 @@ btns.ArrowRight = new Button('ArrowRight', '>');
 keyboard.btnList = btns;
 keyboard.normalizeIt();
 console.log(keyboard.btnList);
+const text = document.createElement('DIV');
+text.classList.add('info');
+text.innerHTML = 'Shift + Alt';
+body.appendChild(text);

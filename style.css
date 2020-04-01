@@ -1,5 +1,6 @@
 body {
     background-color: #1c1b1b;
+    height: 100vh;
 }
 .textarea {
     width: 38vw;
@@ -65,4 +66,8 @@ body {
     min-width: 40px;
     max-width: 40px;
     font-size: 10px;
+}
+.info {
+    width: 38vw;
+    margin: 10px auto 2px;
 }

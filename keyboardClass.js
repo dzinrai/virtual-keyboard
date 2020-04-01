@@ -49,12 +49,17 @@ class Keyboard {
                 this.posIn = this.posIn < this.targetOfKeyboard.value.length ? this.posIn + 1 : this.posIn;
             } else if (this.btnList[keyCode].name === 'ShiftLeft' || this.btnList[keyCode].name === 'ShiftRight') {
                 this.langChange[0] = true;
+                this.upCase = true;
+                this.changeCase();
             } else if (this.btnList[keyCode].name === 'AltLeft' || this.btnList[keyCode].name === 'AltRight') {
                 this.langChange[1] = true;
                 if (this.langChange[0]) {
                     this.changeLanguage();
                 }
                 console.log(this);
+            } else if (this.btnList[keyCode].name === 'CapsLock') {
+                this.upCase = !this.upCase;
+                this.changeCase();
             }
             this.targetOfKeyboard.selectionStart = this.posIn;
             this.targetOfKeyboard.selectionEnd = this.posIn;
@@ -68,6 +73,9 @@ class Keyboard {
             const keyCode = event.code ? event.code : event.keyCode;
             if (this.btnList[keyCode].name === 'ShiftLeft' || this.btnList[keyCode].name === 'ShiftRight') {
                 this.langChange[0] = false;
+                this.upCase = false;
+                this.changeCase();
+                console.log(this.upCase);
             }
             this.btnList[keyCode].removeClass('active');
         });
@@ -138,6 +146,28 @@ class Keyboard {
                 console.log(this.buttonListArray);
             } else if (this.buttonListArray[i].multiLang && this.language === 'en') {
                 this.buttonListArray[i].domElement.innerHTML = this.buttonListArray[i].value;
+            }
+        }
+    }
+
+    changeCase() {
+        if (this.upCase) {
+            for (let i = 0; i < this.buttonListArray.length; i += 1) {
+                if (this.buttonListArray[i].multiLang) {
+                    this.buttonListArray[i].value = String(this.buttonListArray[i].value).toUpperCase();
+                    this.buttonListArray[i].altValue = String(this.buttonListArray[i].altValue).toUpperCase();
+                    this.buttonListArray[i].domElement.innerHTML = String(this.buttonListArray[i].domElement.innerHTML).toUpperCase();
+                    //console.log(this.buttonListArray);
+                }
+            }
+        } else {
+            for (let i = 0; i < this.buttonListArray.length; i += 1) {
+                if (this.buttonListArray[i].multiLang) {
+                    this.buttonListArray[i].value = String(this.buttonListArray[i].value).toLowerCase();
+                    this.buttonListArray[i].altValue = String(this.buttonListArray[i].altValue).toLowerCase();
+                    this.buttonListArray[i].domElement.innerHTML = String(this.buttonListArray[i].domElement.innerHTML).toLowerCase();
+                    //console.log(this.buttonListArray);
+                }
             }
         }
     }
