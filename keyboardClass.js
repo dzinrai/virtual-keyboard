@@ -8,6 +8,7 @@ class Keyboard {
         this.domElement = container;
         this.upCase = false;
         this.keyboardRows = [];
+        this.langChange = [false, false];
         for (let row = 0; row <= 4; row += 1) {
             this.keyboardRows[row] = document.createElement('DIV');
             this.keyboardRows[row].classList.add('keyboard__row');
@@ -30,19 +31,30 @@ class Keyboard {
             const keyCode = event.code ? event.code : event.keyCode;
             if (this.btnList[keyCode].inputTypeValue) {
                 event.preventDefault();
-                if (this.btnList[keyCode].value === 'backspace') {
+
+                let value = this.language === 'en' ? this.btnList[keyCode].value : this.btnList[keyCode].altValue;
+                if (Array.isArray(value)) value = value[0];
+                if (value === 'backspace') {
                     this.targetOfKeyboard.value = this.valueApp('backspace');
                     this.targetOfKeyboard.focus();
-                } else if (this.btnList[keyCode].value === 'delete') {
+                } else if (value === 'delete') {
                     this.targetOfKeyboard.value = this.valueApp('delete');
                     this.targetOfKeyboard.focus();
-                } else this.targetOfKeyboard.value = this.valueApp('none', this.btnList[keyCode].value);
+                } else this.targetOfKeyboard.value = this.valueApp('none', value);
             } else if (this.btnList[keyCode].name === 'ArrowLeft') {
                 event.preventDefault();
                 this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
             } else if (this.btnList[keyCode].name === 'ArrowRight') {
                 event.preventDefault();
                 this.posIn = this.posIn < this.targetOfKeyboard.value.length ? this.posIn + 1 : this.posIn;
+            } else if (this.btnList[keyCode].name === 'ShiftLeft' || this.btnList[keyCode].name === 'ShiftRight') {
+                this.langChange[0] = true;
+            } else if (this.btnList[keyCode].name === 'AltLeft' || this.btnList[keyCode].name === 'AltRight') {
+                this.langChange[1] = true;
+                if (this.langChange[0]) {
+                    this.changeLanguage();
+                }
+                console.log(this);
             }
             this.targetOfKeyboard.selectionStart = this.posIn;
             this.targetOfKeyboard.selectionEnd = this.posIn;
@@ -53,8 +65,11 @@ class Keyboard {
             this.posIn = this.targetOfKeyboard.selectionStart;
         });
         document.addEventListener('keyup', (event) => {
-            if (!event.code) this.btnList[event.keyCode].removeClass('active');
-            else this.btnList[event.code].removeClass('active');
+            const keyCode = event.code ? event.code : event.keyCode;
+            if (this.btnList[keyCode].name === 'ShiftLeft' || this.btnList[keyCode].name === 'ShiftRight') {
+                this.langChange[0] = false;
+            }
+            this.btnList[keyCode].removeClass('active');
         });
         this.targetOfKeyboard.addEventListener('click', (event) => {
             this.posIn = this.targetOfKeyboard.selectionStart;
@@ -64,6 +79,7 @@ class Keyboard {
         this.rowNumber = 0;
         this.numberOfKeysInRow = 0;
         this.posIn = 0;
+        this.buttonListArray = [];
     }
 
     addBtn(button) {
@@ -110,6 +126,24 @@ class Keyboard {
         this.targetOfKeyboard.selectionEnd = this.posIn;
         console.log(this.posIn);
         return value;
+    }
+
+    changeLanguage() {
+        const langTemp = this.language;
+        this.language = this.languageAlter;
+        this.languageAlter = langTemp;
+        for (let i = 0; i < this.buttonListArray.length; i += 1) {
+            if (this.buttonListArray[i].multiLang && this.language === 'ru') {
+                this.buttonListArray[i].domElement.innerHTML = this.buttonListArray[i].altValue;
+                console.log(this.buttonListArray);
+            } else if (this.buttonListArray[i].multiLang && this.language === 'en') {
+                this.buttonListArray[i].domElement.innerHTML = this.buttonListArray[i].value;
+            }
+        }
+    }
+
+    normalizeIt() {
+        this.buttonListArray = [...Object.values(this.btnList)];
     }
 }
 
