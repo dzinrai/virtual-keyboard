@@ -13,7 +13,7 @@ class Keyboard {
             this.keyboardRows[row].classList.add('keyboard__row');
             this.domElement.appendChild(this.keyboardRows[row]);
         }
-        const textarea = document.getElementById('textarea');
+        this.targetOfKeyboard = document.getElementById('textarea');
         this.domElement.addEventListener('click', (event) => {
             console.log(event.target);
             if (event.target.tagName !== 'BUTTON') return false;
@@ -22,31 +22,48 @@ class Keyboard {
             setTimeout(() => { this.triggerKeyboardEvent(document, 'keyup', event.target.id); }, 100);
         });
         document.addEventListener('keydown', (event) => {
-            console.log(event);
-            console.log(`key=${event.key},code=${event.code}`);
-            if (event.code) {
-                if (this.btnList[event.code].inputTypeValue) {
-                    event.preventDefault();
-                    textarea.value += this.btnList[event.code].value;
-                }
-                this.btnList[event.code].addClass('active');
-            } else {
-                if (this.btnList[event.keyCode].inputTypeValue) {
-                    event.preventDefault();
-                    textarea.value += this.btnList[event.keyCode].value;
-                }
-                this.btnList[event.keyCode].addClass('active');
+            this.targetOfKeyboard.focus();
+            this.targetOfKeyboard.selectionStart = this.posIn;
+            // console.log(event);
+            if (event.code) console.log(`key=${event.key},code=${event.code}`);
+            else console.log(`key=${this.btnList[event.keyCode].value},code=${event.keyCode}`);
+            const keyCode = event.code ? event.code : event.keyCode;
+            if (this.btnList[keyCode].inputTypeValue) {
+                event.preventDefault();
+                if (this.btnList[keyCode].value === 'backspace') {
+                    this.targetOfKeyboard.value = this.valueApp('backspace');
+                    this.targetOfKeyboard.focus();
+                } else if (this.btnList[keyCode].value === 'delete') {
+                    this.targetOfKeyboard.value = this.valueApp('delete');
+                    this.targetOfKeyboard.focus();
+                } else this.targetOfKeyboard.value = this.valueApp('none', this.btnList[keyCode].value);
+            } else if (this.btnList[keyCode].name === 'ArrowLeft') {
+                event.preventDefault();
+                this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
+            } else if (this.btnList[keyCode].name === 'ArrowRight') {
+                event.preventDefault();
+                this.posIn = this.posIn < this.targetOfKeyboard.value.length ? this.posIn + 1 : this.posIn;
             }
-
+            this.targetOfKeyboard.selectionStart = this.posIn;
+            this.targetOfKeyboard.selectionEnd = this.posIn;
+            this.btnList[keyCode].addClass('active');
             // console.log(textarea.value);
+        });
+        this.targetOfKeyboard.addEventListener('blur', (event) => {
+            this.posIn = this.targetOfKeyboard.selectionStart;
         });
         document.addEventListener('keyup', (event) => {
             if (!event.code) this.btnList[event.keyCode].removeClass('active');
             else this.btnList[event.code].removeClass('active');
         });
+        this.targetOfKeyboard.addEventListener('click', (event) => {
+            this.posIn = this.targetOfKeyboard.selectionStart;
+            console.log(this.targetOfKeyboard.selectionStart);
+        });
         this.totalNumberOfKeys = this.btnList.length;
         this.rowNumber = 0;
         this.numberOfKeysInRow = 0;
+        this.posIn = 0;
     }
 
     addBtn(button) {
@@ -54,7 +71,7 @@ class Keyboard {
         this.btnList[button.name] = button;
         const rowsCounterConst = [14, 14, 14, 14, 14];
         if (this.numberOfKeysInRow < rowsCounterConst[this.rowNumber]) {
-            this.keyboardRows[this.rowNumber].appendChild(button.domElement); 
+            this.keyboardRows[this.rowNumber].appendChild(button.domElement);
         } else {
             this.rowNumber += 1;
             this.numberOfKeysInRow = 0;
@@ -64,15 +81,35 @@ class Keyboard {
     }
 
     triggerKeyboardEvent(el, keyState = 'keydown', keyCode) {
-        this.eventObj = el.createEventObject ? el.createEventObject() : el.createEvent('Events');
-        if (this.eventObj.initEvent) {
-            this.eventObj.initEvent(keyState, true, true);
-        }
+        this.targetOfKeyboard.focus();
+        this.eventObj = new Event(keyState);
         this.eventObj.keyCode = keyCode;
         this.eventObj.which = keyCode;
-        if (el.dispatchEvent) {
-            el.dispatchEvent(this.eventObj);
+        el.dispatchEvent(this.eventObj);
+        console.log(this.eventObj);
+    }
+
+    valueApp(mod, value_) {
+        let valueBefore = '';
+        let value = value_ === undefined ? '' : value_;
+        console.log(mod, value, this.posIn);
+        let valueAfter = '';
+        if (mod === 'backspace') valueBefore = ''.concat(this.targetOfKeyboard.value).slice(0, this.targetOfKeyboard.selectionStart - 1);
+        else valueBefore = ''.concat(this.targetOfKeyboard.value).slice(0, this.targetOfKeyboard.selectionStart);
+        if (mod === 'delete') valueAfter = ''.concat(this.targetOfKeyboard.value).slice(this.targetOfKeyboard.selectionEnd + 1);
+        else valueAfter = ''.concat(this.targetOfKeyboard.value).slice(this.targetOfKeyboard.selectionEnd);
+        console.log(valueBefore, value, valueAfter);
+        value = valueBefore.concat(value).concat(valueAfter);
+
+        if (mod === 'none') {
+            this.posIn += 1;
+        } else if (mod === 'backspace') {
+            this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
         }
+        this.targetOfKeyboard.selectionStart = this.posIn;
+        this.targetOfKeyboard.selectionEnd = this.posIn;
+        console.log(this.posIn);
+        return value;
     }
 }
 

@@ -26,12 +26,16 @@ class Button {
         this.domElement.classList.add('button__'.concat(name.toLowerCase()));
         this.domElement.setAttribute('id', name);
         this.addToKeyboard(keyboard);
-        if (name === 'Delete' || name === 'Backspace' || name === 'Tab' || name === 'ControlLeft' || name === 'ControlRight' || name === 'ShiftLeft' || name === 'ShiftRight' || name === 'AltLeft' || name === 'AltRight' || name === 'ArrowUp' || name === 'ArrowLeft' || name === 'ArrowRight' || name === 'ArrowDown' || name === 'CapsLock' || name === 'OSLeft') {
+        if (name === 'Tab' || name === 'ControlLeft' || name === 'ControlRight' || name === 'ShiftLeft' || name === 'ShiftRight' || name === 'AltLeft' || name === 'AltRight' || name === 'ArrowUp' || name === 'ArrowLeft' || name === 'ArrowRight' || name === 'ArrowDown' || name === 'CapsLock' || name === 'OSLeft') {
             this.inputTypeValue = false;
         } else if (name === 'Space') {
             this.value = ' ';
         } else if (name === 'Enter') {
             this.value = '\n';
+        } else if (name === 'Backspace') {
+            this.value = 'backspace';
+        } else if (name === 'Delete') {
+            this.value = 'delete';
         }
     }
 
