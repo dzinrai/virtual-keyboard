@@ -10,6 +10,7 @@ class Keyboard {
         this.shiftPressed = false;
         this.capsPressed = false;
         this.ctrlPressed = false;
+        this.altPressed = false;
         this.keyboardRows = [];
         for (let row = 0; row <= 4; row += 1) {
             this.keyboardRows[row] = document.createElement('DIV');
@@ -19,9 +20,15 @@ class Keyboard {
         this.targetOfKeyboard = document.getElementById('textarea');
         this.domElement.addEventListener('click', (event) => {
             console.log(event.target);
-            if (event.target.tagName !== 'BUTTON' || event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') return false;
-            this.triggerKeyboardEvent(document, 'keydown', event.target.id);
-            setTimeout(() => { this.triggerKeyboardEvent(document, 'keyup', event.target.id); }, 100);
+            let keyCode = null;
+            if (event.target.tagName === 'BUTTON') keyCode = event.target.id;
+            else if (event.target.tagName === 'SPAN') keyCode = event.target.parentElement.id;
+            else return;
+
+            if (keyCode === 'ShiftLeft' || keyCode === 'ShiftRight' || keyCode === 'AltLeft' || keyCode === 'AltRight' || keyCode === 'ControlLeft' || keyCode === 'ControlRight') return;
+            console.log(event.target);
+            this.triggerKeyboardEvent(document, 'keydown', keyCode);
+            setTimeout(() => { this.triggerKeyboardEvent(document, 'keyup', keyCode); }, 200);
         });
         document.addEventListener('keydown', (event) => {
             this.targetOfKeyboard.focus();
@@ -69,11 +76,16 @@ class Keyboard {
                 if (this.btnList[keyCode].name === 'ShiftLeft') this.btnList.ShiftRight.locked = true;
                 else this.btnList.ShiftLeft.locked = true;
             } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
+                event.preventDefault();
                 this.ctrlPressed = true;
+            } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
+                event.preventDefault();
+                this.altPressed = true;
             } else if (this.btnList[keyCode].name === 'CapsLock') {
                 this.capsPressed = true;
                 this.changeCase();
             }
+            if (this.ctrlPressed && this.altPressed) this.changeLanguage();
             this.targetOfKeyboard.selectionStart = this.posIn;
             this.targetOfKeyboard.selectionEnd = this.posIn;
             if (!this.btnList[keyCode].locked) this.btnList[keyCode].addClass('active');
@@ -81,19 +93,39 @@ class Keyboard {
         });
         // shifr key mouse controls
         this.domElement.addEventListener('mousedown', (event) => {
-            if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
+            let keyCode = null;
+            if (event.target.tagName === 'BUTTON') keyCode = event.target.id;
+            else if (event.target.tagName === 'SPAN') keyCode = event.target.parentElement.id;
+            else return;
+
+            if (keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') {
                 this.shiftPressed = true;
                 this.changeCase();
-                if (event.target.id === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
+                if (keyCode === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
+            } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
+                this.altPressed = true;
+            } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
+                this.ctrlPressed = true;
             }
         });
         this.domElement.addEventListener('mouseup', (event) => {
-            if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
+            let keyCode = null;
+            if (event.target.tagName === 'BUTTON') keyCode = event.target.id;
+            else if (event.target.tagName === 'SPAN') keyCode = event.target.parentElement.id;
+            else return;
+
+            if (keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') {
                 this.shiftPressed = false;
                 this.changeCase();
-                if (event.target.id === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
+                if (keyCode === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
+            } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
+                if (this.ctrlPressed && this.altPressed) this.changeLanguage();
+                this.ctrlPressed = false;
+            } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
+                if (this.ctrlPressed && this.altPressed) this.changeLanguage();
+                this.altPressed = false;
             }
         });
         //
@@ -108,10 +140,12 @@ class Keyboard {
                 this.changeCase();
                 if (keyCode === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
+            } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
+                event.preventDefault();
+                this.ctrlPressed = false;
             } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
-                if (this.ctrlPressed) {
-                    this.changeLanguage();
-                }
+                event.preventDefault();
+                this.altPressed = false;
             }
             this.btnList[keyCode].removeClass('active');
         });
@@ -181,6 +215,8 @@ class Keyboard {
             const btn = this.buttonListArray[i];
             btn.changeText(this.upCase);
         }
+        this.ctrlPressed = false;
+        this.altPressed = false;
     }
 
     changeCase(upperCase) {
