@@ -2,15 +2,14 @@
 /* eslint-disable indent */
 class Keyboard {
     constructor(lang, langAdd, buttonList, container) {
-        this.language = lang;
-        this.languageAlter = langAdd;
+        this.language = localStorage.getItem('lang') !== null ? localStorage.getItem('lang') : lang;
+        this.languageAlter = this.language === 'en' ? 'ru' : 'en';
         this.btnList = buttonList;
         this.domElement = container;
         this.upCase = false;
         this.shiftPressed = false;
         this.capsPressed = false;
         this.keyboardRows = [];
-        this.langChange = [false, false];
         for (let row = 0; row <= 4; row += 1) {
             this.keyboardRows[row] = document.createElement('DIV');
             this.keyboardRows[row].classList.add('keyboard__row');
@@ -52,17 +51,17 @@ class Keyboard {
                 } else if (this.upCase) {
                     this.targetOfKeyboard.value = this.valueApp('none', String(value).toUpperCase());
                 }
-            } else if (this.btnList[keyCode].name === 'ArrowLeft') {
+            } else if (keyCode === 'ArrowLeft') {
                 event.preventDefault();
                 this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
-            } else if (this.btnList[keyCode].name === 'ArrowRight') {
+            } else if (keyCode === 'ArrowRight') {
                 event.preventDefault();
                 this.posIn = this.posIn < this.targetOfKeyboard.value.length ? this.posIn + 1 : this.posIn;
-            } else if (this.btnList[keyCode].name === 'ArrowUp') {
+            } else if (keyCode === 'ArrowUp') {
                 event.preventDefault();
-            } else if (this.btnList[keyCode].name === 'ArrowDown') {
+            } else if (keyCode === 'ArrowDown') {
                 event.preventDefault();
-            } else if ((this.btnList[keyCode].name === 'ShiftLeft' || this.btnList[keyCode].name === 'ShiftRight') && !this.shiftPressed && !this.btnList[keyCode].locked) {
+            } else if ((keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') && !this.shiftPressed && !this.btnList[keyCode].locked) {
                 this.shiftPressed = true;
                 this.changeCase();
                 if (this.btnList[keyCode].name === 'ShiftLeft') this.btnList.ShiftRight.locked = true;
@@ -77,7 +76,7 @@ class Keyboard {
             }
             this.targetOfKeyboard.selectionStart = this.posIn;
             this.targetOfKeyboard.selectionEnd = this.posIn;
-            this.btnList[keyCode].addClass('active');
+            if (!this.btnList[keyCode].locked) this.btnList[keyCode].addClass('active');
             console.log(this.targetOfKeyboard.selectionStart);
         });
         // shifr key mouse controls
@@ -85,7 +84,7 @@ class Keyboard {
             if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
                 this.shiftPressed = true;
                 this.changeCase();
-                if (this.btnList[event.target.id].name === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
+                if (event.target.id === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
             }
         });
@@ -93,7 +92,7 @@ class Keyboard {
             if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
                 this.shiftPressed = false;
                 this.changeCase();
-                if (this.btnList[event.target.id].name === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
+                if (event.target.id === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
             }
         });
@@ -103,13 +102,12 @@ class Keyboard {
         });
         document.addEventListener('keyup', (event) => {
             const keyCode = event.code ? event.code : event.keyCode;
-            if (this.btnList[keyCode].name === 'ShiftLeft' || this.btnList[keyCode].name === 'ShiftRight') {
+            if (keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') {
                 this.shiftPressed = false;
                 this.changeCase();
-                if (this.btnList[keyCode].name === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
+                if (keyCode === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
             }
-            console.log(keyCode);
             this.btnList[keyCode].removeClass('active');
         });
         this.targetOfKeyboard.addEventListener('click', (event) => {
@@ -120,6 +118,7 @@ class Keyboard {
         this.numberOfKeysInRow = 0;
         this.posIn = 0;
         this.buttonListArray = [];
+        this.saveKeyboard();
     }
 
     addBtn(button) {
@@ -170,6 +169,7 @@ class Keyboard {
         const langTemp = this.language;
         this.language = this.languageAlter;
         this.languageAlter = langTemp;
+        this.saveKeyboard();
         for (let i = 0; i < this.buttonListArray.length; i += 1) {
             if (this.buttonListArray[i].multiLang && this.language === 'ru') {
                 this.buttonListArray[i].domElement.innerHTML = Array.isArray(this.buttonListArray[i].altValue) ? this.buttonListArray[i].altValue.join('') : this.buttonListArray[i].altValue;
@@ -200,6 +200,10 @@ class Keyboard {
 
     normalizeIt() {
         this.buttonListArray = [...Object.values(this.btnList)];
+    }
+
+    saveKeyboard() {
+        localStorage.setItem('lang', this.language);
     }
 }
 

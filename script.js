@@ -20,8 +20,9 @@ class Button {
         this.value = value;
         this.altValue = altValue;
         this.domElement = document.createElement('BUTTON');
-        if (keyboard.language === 'en') this.domElement.innerHTML = Array.isArray(value) ? value.join(' ') : value;
-        else this.domElement.innerHTML = Array.isArray(altValue) ? altValue.join('') : altValue;
+        if (keyboard.language === 'en' && multiLang) this.domElement.innerHTML = Array.isArray(value) ? value.join(' ') : value;
+        else if (keyboard.language === 'ru' && multiLang) this.domElement.innerHTML = Array.isArray(altValue) ? altValue.join('') : altValue;
+        else this.domElement.innerHTML = value;
         this.inputTypeValue = true;
         this.workerType = false;
         this.multiLang = multiLang;
@@ -124,6 +125,7 @@ btns.ArrowRight = new Button('ArrowRight', '>');
 //
 keyboard.btnList = btns;
 keyboard.normalizeIt();
+console.log(keyboard);
 console.log(keyboard.btnList);
 const text = document.createElement('DIV');
 text.classList.add('info');
