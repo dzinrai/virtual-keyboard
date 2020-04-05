@@ -9,6 +9,7 @@ class Keyboard {
         this.upCase = false;
         this.shiftPressed = false;
         this.capsPressed = false;
+        this.ctrlPressed = false;
         this.keyboardRows = [];
         for (let row = 0; row <= 4; row += 1) {
             this.keyboardRows[row] = document.createElement('DIV');
@@ -28,6 +29,7 @@ class Keyboard {
             if (event.code) console.log(`key=${event.key},code=${event.code}`);
             else console.log(`key=${this.btnList[event.keyCode].value},code=${event.keyCode}`);
             const keyCode = event.code ? event.code : event.keyCode;
+            if (!this.btnList[keyCode]) return;
             if (this.btnList[keyCode].inputTypeValue) {
                 event.preventDefault();
                 let value;
@@ -66,10 +68,8 @@ class Keyboard {
                 this.changeCase();
                 if (this.btnList[keyCode].name === 'ShiftLeft') this.btnList.ShiftRight.locked = true;
                 else this.btnList.ShiftLeft.locked = true;
-            } else if (this.btnList[keyCode].name === 'ControlLeft' || this.btnList[keyCode].name === 'ControlRight') {
-                if (this.shiftPressed) {
-                    this.changeLanguage();
-                }
+            } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
+                this.ctrlPressed = true;
             } else if (this.btnList[keyCode].name === 'CapsLock') {
                 this.capsPressed = true;
                 this.changeCase();
@@ -102,11 +102,16 @@ class Keyboard {
         });
         document.addEventListener('keyup', (event) => {
             const keyCode = event.code ? event.code : event.keyCode;
+            if (!this.btnList[keyCode]) return;
             if (keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') {
                 this.shiftPressed = false;
                 this.changeCase();
                 if (keyCode === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
+            } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
+                if (this.ctrlPressed) {
+                    this.changeLanguage();
+                }
             }
             this.btnList[keyCode].removeClass('active');
         });
@@ -119,6 +124,7 @@ class Keyboard {
         this.posIn = 0;
         this.buttonListArray = [];
         this.saveKeyboard();
+        this.changeLanguage.bind(this);
     }
 
     addBtn(button) {
@@ -169,31 +175,20 @@ class Keyboard {
         const langTemp = this.language;
         this.language = this.languageAlter;
         this.languageAlter = langTemp;
+        console.log(this.language);
         this.saveKeyboard();
         for (let i = 0; i < this.buttonListArray.length; i += 1) {
-            if (this.buttonListArray[i].multiLang && this.language === 'ru') {
-                this.buttonListArray[i].domElement.innerHTML = Array.isArray(this.buttonListArray[i].altValue) ? this.buttonListArray[i].altValue.join('') : this.buttonListArray[i].altValue;
-            } else if (this.buttonListArray[i].multiLang && this.language === 'en') {
-                this.buttonListArray[i].domElement.innerHTML = Array.isArray(this.buttonListArray[i].value) ? this.buttonListArray[i].value.join('') : this.buttonListArray[i].value;
-            }
+            const btn = this.buttonListArray[i];
+            btn.changeText(this.upCase);
         }
     }
 
     changeCase(upperCase) {
         this.upCase = upperCase === undefined ? !this.upCase : upperCase;
-        if (this.upCase) {
-            for (let i = 0; i < this.buttonListArray.length; i += 1) {
-                if (this.buttonListArray[i].multiLang && !this.buttonListArray[i].digitType) {
-                    this.buttonListArray[i].domElement.innerHTML = String(this.buttonListArray[i].domElement.innerHTML).toUpperCase();
-                    // console.log(this.buttonListArray);
-                }
-            }
-        } else {
-            for (let i = 0; i < this.buttonListArray.length; i += 1) {
-                if (this.buttonListArray[i].multiLang && !this.buttonListArray[i].digitType) {
-                    this.buttonListArray[i].domElement.innerHTML = String(this.buttonListArray[i].domElement.innerHTML).toLowerCase();
-                    //console.log(this.buttonListArray);
-                }
+        for (let i = 0; i < this.buttonListArray.length; i += 1) {
+            const btn = this.buttonListArray[i];
+            if (this.buttonListArray[i].multiLang && !this.buttonListArray[i].digitType) {
+                btn.changeText(this.upCase);
             }
         }
     }

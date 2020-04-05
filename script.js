@@ -19,10 +19,13 @@ class Button {
         this.name = name;
         this.value = value;
         this.altValue = altValue;
+        //
         this.domElement = document.createElement('BUTTON');
-        if (keyboard.language === 'en' && multiLang) this.domElement.innerHTML = Array.isArray(value) ? value.join(' ') : value;
-        else if (keyboard.language === 'ru' && multiLang) this.domElement.innerHTML = Array.isArray(altValue) ? altValue.join('') : altValue;
-        else this.domElement.innerHTML = value;
+        this.spanForValue = document.createElement('SPAN');
+        this.spanForShiftValue = document.createElement('SPAN');
+        this.domElement.appendChild(this.spanForValue);
+        this.domElement.appendChild(this.spanForShiftValue);
+        //
         this.inputTypeValue = true;
         this.workerType = false;
         this.multiLang = multiLang;
@@ -31,6 +34,9 @@ class Button {
         this.domElement.classList.add('button__'.concat(name.toLowerCase()));
         this.domElement.setAttribute('id', name);
         this.addToKeyboard(keyboard);
+        this.keyBoard = keyboard;
+        this.spanText = value;
+        this.changeText();
         if (name === 'ControlLeft' || name === 'ControlRight' || name === 'ShiftLeft' || name === 'ShiftRight' || name === 'AltLeft' || name === 'AltRight' || name === 'ArrowUp' || name === 'ArrowLeft' || name === 'ArrowRight' || name === 'ArrowDown' || name === 'CapsLock' || name === 'OSLeft') {
             this.inputTypeValue = false;
             this.workerType = true;
@@ -51,6 +57,7 @@ class Button {
             this.workerType = true;
         }
         this.locked = false;
+        /*this.changeText.bind(this);*/
     }
 
     addToKeyboard(keyBoard) {
@@ -58,6 +65,21 @@ class Button {
     }
 
     // View methods
+    changeText(up) {
+        const spanValue = this.spanForValue;
+        const spanShiftValue = this.spanForShiftValue;
+        if (Array.isArray(this.value) && this.multiLang) {
+            if (this.keyBoard.language === 'en') [spanValue.innerHTML, spanShiftValue.innerHTML] = this.value;
+            else if (this.keyBoard.language === 'ru') {
+                [spanValue.innerHTML, spanShiftValue.innerHTML] = this.altValue;
+                if (up) spanValue.innerHTML = String(spanValue.innerHTML).toUpperCase();
+            }
+        } else if (!Array.isArray(this.value) && this.multiLang) {
+            if (this.keyBoard.language === 'en') spanValue.innerHTML = up ? String(this.value).toUpperCase() : this.value;
+            else if (this.keyBoard.language === 'ru') spanValue.innerHTML = up ? String(this.altValue).toUpperCase() : this.altValue;
+        } else spanValue.innerHTML = this.spanText;
+    }
+
     addClass(className) {
         this.domElement.classList.add(className);
     }
@@ -68,7 +90,7 @@ class Button {
 }
 
 // Creating buttons
-btns.Backquote = new Button('Backquote', ['`', '~'], 'ё', true);
+btns.Backquote = new Button('Backquote', ['`', '~'], ['ё', ''], true);
 for (let i = 1; i <= 10; i += 1) {
     const symb = [['!', '!'], ['@', '"'], ['#', '№'], ['$', ';'], ['%', '%'], ['^', ':'], ['&', '?'], ['*', '*'], ['(', '('], [')', ')']];
     // digits
@@ -76,8 +98,8 @@ for (let i = 1; i <= 10; i += 1) {
     const btn = 'Digit'.concat(num);
     btns[btn] = new Button(btn, [num, symb[i - 1][0]], [num, symb[i - 1][1]], true);
 }
-btns.Minus = new Button('Minus', ['-', '_'], ['-', '_']);
-btns.Equal = new Button('Equal', ['=', '+'], ['=', '+']);
+btns.Minus = new Button('Minus', ['-', '_'], ['-', '_'], true);
+btns.Equal = new Button('Equal', ['=', '+'], ['=', '+'], true);
 btns.Backspace = new Button('Backspace', 'Backspace');
 btns.Tab = new Button('Tab', 'Tab');
 const keyList1 = 'qwertyuiop';
@@ -86,8 +108,8 @@ for (let i = 0; i < keyList1.length; i += 1) {
     const btn = 'Key'.concat(keyList1[i].toUpperCase());
     btns[btn] = new Button(btn, keyList1[i], keyList1alt[i], true);
 }
-btns.BracketLeft = new Button('BracketLeft', ['[', '{'], 'х', true);
-btns.BracketRight = new Button('BracketRight', [']', '}'], 'ъ', true);
+btns.BracketLeft = new Button('BracketLeft', ['[', '{'], ['х', ''], true);
+btns.BracketRight = new Button('BracketRight', [']', '}'], ['ъ', ''], true);
 btns.Delete = new Button('Delete', 'Del');
 btns.CapsLock = new Button('CapsLock', 'Caps');
 const keyList2 = 'asdfghjkl';
@@ -96,8 +118,8 @@ for (let i = 0; i < keyList2.length; i += 1) {
     const btn = 'Key'.concat(keyList2[i].toUpperCase());
     btns[btn] = new Button(btn, keyList2[i], keyList2alt[i], true);
 }
-btns.Semicolon = new Button('Semicolon', [';', ':'], 'ж', true);
-btns.Quote = new Button('Quote', ['\'', '"'], 'э', true);
+btns.Semicolon = new Button('Semicolon', [';', ':'], ['ж', ''], true);
+btns.Quote = new Button('Quote', ['\'', '"'], ['э', ''], true);
 btns.Backslash = new Button('Backslash', ['\\', '|'], ['\\', '/'], true);
 btns.Enter = new Button('Enter', 'Enter');
 btns.ShiftLeft = new Button('ShiftLeft', 'Shift');
@@ -108,8 +130,8 @@ for (let i = 0; i < keyList3.length; i += 1) {
     const btn = 'Key'.concat(keyList3[i].toUpperCase());
     btns[btn] = new Button(btn, keyList3[i], keyList3alt[i], true);
 }
-btns.Comma = new Button('Comma', [',', '<'], 'б', true);
-btns.Period = new Button('Period', ['.', '>'], 'ю', true);
+btns.Comma = new Button('Comma', [',', '<'], ['б', ''], true);
+btns.Period = new Button('Period', ['.', '>'], ['ю', ''], true);
 btns.Slash = new Button('Slash', ['/', '?'], ['.', ','], true);
 btns.ArrowUp = new Button('ArrowUp', '^');
 btns.ShiftRight = new Button('ShiftRight', 'Shift');
@@ -125,9 +147,8 @@ btns.ArrowRight = new Button('ArrowRight', '>');
 //
 keyboard.btnList = btns;
 keyboard.normalizeIt();
-console.log(keyboard);
-console.log(keyboard.btnList);
 const text = document.createElement('DIV');
 text.classList.add('info');
-text.innerHTML = 'Shift + Ctrl';
+text.innerHTML = 'Ctrl + Alt';
 body.appendChild(text);
+console.log(keyboard.btnList);
