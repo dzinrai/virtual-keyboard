@@ -57,7 +57,6 @@ class Button {
             this.workerType = true;
         }
         this.locked = false;
-        /*this.changeText.bind(this);*/
     }
 
     addToKeyboard(keyBoard) {
@@ -133,7 +132,7 @@ for (let i = 0; i < keyList3.length; i += 1) {
 btns.Comma = new Button('Comma', [',', '<'], ['б', ''], true);
 btns.Period = new Button('Period', ['.', '>'], ['ю', ''], true);
 btns.Slash = new Button('Slash', ['/', '?'], ['.', ','], true);
-btns.ArrowUp = new Button('ArrowUp', '^');
+btns.ArrowUp = new Button('ArrowUp', 'up');
 btns.ShiftRight = new Button('ShiftRight', 'Shift');
 btns.ControlLeft = new Button('ControlLeft', 'Ctrl');
 btns.OSLeft = new Button('OSLeft', 'Win');
@@ -141,9 +140,9 @@ btns.AltLeft = new Button('AltLeft', 'Alt');
 btns.Space = new Button('Space', 'Space');
 btns.AltRight = new Button('AltRight', 'Alt');
 btns.ControlRight = new Button('ControlRight', 'Ctrl');
-btns.ArrowLeft = new Button('ArrowLeft', '<');
+btns.ArrowLeft = new Button('ArrowLeft', 'left');
 btns.ArrowDown = new Button('ArrowDown', 'down');
-btns.ArrowRight = new Button('ArrowRight', '>');
+btns.ArrowRight = new Button('ArrowRight', 'right');
 //
 keyboard.btnList = btns;
 keyboard.normalizeIt();
@@ -151,4 +150,3 @@ const text = document.createElement('DIV');
 text.classList.add('info');
 text.innerHTML = 'Ctrl + Alt';
 body.appendChild(text);
-console.log(keyboard.btnList);
