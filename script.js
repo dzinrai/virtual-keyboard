@@ -146,7 +146,12 @@ btns.ArrowRight = new Button('ArrowRight', 'right');
 //
 keyboard.btnList = btns;
 keyboard.normalizeIt();
-const text = document.createElement('DIV');
-text.classList.add('info');
-text.innerHTML = 'Ctrl + Alt';
-body.appendChild(text);
+const textContainer = document.createElement('DIV');
+textContainer.classList.add('info');
+const tooltip1 = document.createElement('SPAN');
+const tooltip2 = document.createElement('SPAN');
+tooltip1.innerHTML = 'Ctrl + Alt';
+tooltip2.innerHTML = 'Windows';
+textContainer.appendChild(tooltip1);
+textContainer.appendChild(tooltip2);
+body.appendChild(textContainer);

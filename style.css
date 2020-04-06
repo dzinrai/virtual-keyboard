@@ -5,25 +5,28 @@ body {
 }
 .textarea {
     width: 38vw;
-    min-width: 736px;
+    min-width: 732px;
     min-height: 200px;
     display: block;
+    padding: 0 4px;
     margin: 0 auto 2px;
     border-radius: 4px;
     font-size: 16px;
+    background-color: #130c0c;
+    color: #f0eeee;
 }
 .keyboard__container {
     width: 38vw;
     min-width: 736px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 30px auto;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     background-color: #500e6f;
-    padding: 3px;
+    padding: 3px 6px;
     border-radius: 5px;
     font-size: 16px;
+    border: 3px solid #370350;
 }
 .keyboard__row {
     width: 100%;
@@ -56,6 +59,13 @@ body {
 }
 .button__space {
     flex: 1 0 30%;
+}
+.button__backspace {
+    font-size: 15px;
+    flex: 1 0 5%;
+}
+.button__enter {
+    flex: 1 0 11%;
 }
 .button__arrowup,
 .button__arrowleft,
@@ -97,10 +107,28 @@ body {
 }
 .button__arrowdown::before {
     transform: rotate(180deg);
+    background-size: 19px;
+    background-position: 10px 7px;
 }
 .info {
-    width: 38vw;
+    position: absolute;
+    top: 0;
+    max-width: 200px;
     margin: 10px auto 2px;
+    text-align: center;
+    font-size: 30px;
+    color: rgb(218, 196, 6);
+    background-color: #500e6f;
+    padding: 10px;
+    border-radius: 5px;
+    border: 3px solid #370350;
+}
+.info span {
+    display: block;
+}
+.info span:last-child {
+    font-size: 25px;
+    color: rgb(179, 161, 3);
 }
 .keyboard__button span:last-child {
     position: absolute;
