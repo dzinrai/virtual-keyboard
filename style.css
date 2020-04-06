@@ -36,7 +36,8 @@ body {
 }
 .keyboard__button {
     position: relative;
-    padding: 5px 10px;
+    max-width: 40px;
+    padding: 5px 10px 9px;
     margin: 3px;
     border-radius: 5px;
     border: none;
@@ -65,7 +66,7 @@ body {
     flex: 1 0 5%;
 }
 .button__enter {
-    flex: 1 0 11%;
+    flex: 1 0 5%;
 }
 .button__arrowup,
 .button__arrowleft,
@@ -107,8 +108,8 @@ body {
 }
 .button__arrowdown::before {
     transform: rotate(180deg);
-    background-size: 19px;
-    background-position: 10px 7px;
+    background-size: 20px;
+    background-position: 10px 9px;
 }
 .info {
     position: absolute;
@@ -136,4 +137,11 @@ body {
     right: 5px;
     font-size: 0.6em;
     opacity: 0.4;
+}
+.keyboard__row:nth-child(2) .keyboard__button:not(.worker-type) {
+    max-width: 43px;
+}
+.worker-type {
+    max-width: unset;
+    padding-top: 7px;
 }

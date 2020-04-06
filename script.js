@@ -56,6 +56,7 @@ class Button {
             this.value = '\t';
             this.workerType = true;
         }
+        if (this.workerType) this.domElement.classList.add('worker-type');
         this.locked = false;
     }
 
