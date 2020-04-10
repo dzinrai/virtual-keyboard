@@ -7,10 +7,9 @@ class Keyboard {
         this.btnList = buttonList;
         [this.domElement] = document.getElementsByClassName('keyboard__container');
         this.upCase = false;
-        this.shiftPressed = false;
-        this.capsPressed = false;
-        this.ctrlPressed = false;
-        this.altPressed = false;
+        this.keysPressed = {
+            ctrl: false, alt: false, caps: false, shift: false,
+        };
         this.keyboardRows = [];
         for (let row = 0; row <= 4; row += 1) {
             this.keyboardRows[row] = createDomElement('DIV', null, 'keyboard__row', this.domElement);
@@ -48,7 +47,7 @@ class Keyboard {
                     this.targetOfKeyboard.focus();
                 } else if (!this.upCase) {
                     this.targetOfKeyboard.value = this.valueApp('none', String(value).toLowerCase());
-                } else if (this.shiftPressed && secondValue !== null) {
+                } else if (this.keysPressed.shift && secondValue !== null) {
                     this.targetOfKeyboard.value = this.valueApp('none', String(secondValue));
                 } else if (this.upCase) {
                     this.targetOfKeyboard.value = this.valueApp('none', String(value).toUpperCase());
@@ -65,22 +64,22 @@ class Keyboard {
             } else if (keyCode === 'ArrowDown') {
                 event.preventDefault();
                 this.downArrow();
-            } else if ((keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') && !this.shiftPressed && !this.btnList[keyCode].locked) {
-                this.shiftPressed = true;
+            } else if ((keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') && !this.keysPressed.shift && !this.btnList[keyCode].locked) {
+                this.keysPressed.shift = true;
                 this.changeCase();
                 if (this.btnList[keyCode].name === 'ShiftLeft') this.btnList.ShiftRight.locked = true;
                 else this.btnList.ShiftLeft.locked = true;
             } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
                 event.preventDefault();
-                this.ctrlPressed = true;
+                this.keysPressed.ctrl = true;
             } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
                 event.preventDefault();
-                this.altPressed = true;
+                this.keysPressed.alt = true;
             } else if (this.btnList[keyCode].name === 'CapsLock') {
-                this.capsPressed = true;
+                this.keysPressed.caps = true;
                 this.changeCase();
             }
-            if (this.ctrlPressed && this.altPressed) this.changeLanguage();
+            if (this.keysPressed.ctrl && this.keysPressed.alt) this.changeLanguage();
             this.targetOfKeyboard.selectionStart = this.posIn;
             this.targetOfKeyboard.selectionEnd = this.posIn;
             if (!this.btnList[keyCode].locked) this.btnList[keyCode].addClass('active');
@@ -93,14 +92,14 @@ class Keyboard {
             else return;
 
             if (keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') {
-                this.shiftPressed = true;
+                this.keysPressed.shift = true;
                 this.changeCase();
                 if (keyCode === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
             } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
-                this.altPressed = true;
+                this.keysPressed.alt = true;
             } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
-                this.ctrlPressed = true;
+                this.keysPressed.ctrl = true;
             }
         });
         this.domElement.addEventListener('mouseup', (event) => {
@@ -110,16 +109,16 @@ class Keyboard {
             else return;
 
             if (keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') {
-                this.shiftPressed = false;
+                this.keysPressed.shift = false;
                 this.changeCase();
                 if (keyCode === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
             } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
-                if (this.ctrlPressed && this.altPressed) this.changeLanguage();
-                this.ctrlPressed = false;
+                if (this.keysPressed.ctrl && this.keysPressed.alt) this.changeLanguage();
+                this.keysPressed.ctrl = false;
             } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
-                if (this.ctrlPressed && this.altPressed) this.changeLanguage();
-                this.altPressed = false;
+                if (this.keysPressed.ctrl && this.keysPressed.alt) this.changeLanguage();
+                this.keysPressed.alt = false;
             }
         });
         //
@@ -130,16 +129,16 @@ class Keyboard {
             const keyCode = event.code ? event.code : event.keyCode;
             if (!this.btnList[keyCode]) return;
             if (keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') {
-                this.shiftPressed = false;
+                this.keysPressed.shift = false;
                 this.changeCase();
                 if (keyCode === 'ShiftLeft') this.btnList.ShiftRight.locked = false;
                 else this.btnList.ShiftLeft.locked = false;
             } else if (keyCode === 'ControlLeft' || keyCode === 'ControlRight') {
                 event.preventDefault();
-                this.ctrlPressed = false;
+                this.keysPressed.ctrl = false;
             } else if (keyCode === 'AltLeft' || keyCode === 'AltRight') {
                 event.preventDefault();
-                this.altPressed = false;
+                this.keysPressed.alt = false;
             }
             this.btnList[keyCode].removeClass('active');
         });
@@ -172,7 +171,7 @@ class Keyboard {
     triggerKeyboardEvent(el, keyState = 'keydown', keyCode) {
         this.targetOfKeyboard.focus();
         this.eventObj = new Event(keyState);
-        this.eventObj.keyCode = keyCode;
+        this.eventObj.code = keyCode;
         this.eventObj.which = keyCode;
         el.dispatchEvent(this.eventObj);
     }
@@ -206,8 +205,8 @@ class Keyboard {
         this.buttonListArray.forEach((btn) => {
             btn.changeText(this.upCase);
         });
-        this.ctrlPressed = false;
-        this.altPressed = false;
+        this.keysPressed.ctrl = false;
+        this.keysPressed.alt = false;
     }
 
     changeCase(upperCase) {
