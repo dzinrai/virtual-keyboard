@@ -1,9 +1,11 @@
+import createDomElement from './createDomElement.js';
+
 class Keyboard {
-    constructor(lang, langAdd, buttonList, container) {
+    constructor(lang, langAdd, buttonList) {
         this.language = localStorage.getItem('lang') !== null ? localStorage.getItem('lang') : lang;
         this.languageAlter = this.language === 'en' ? 'ru' : 'en';
         this.btnList = buttonList;
-        this.domElement = container;
+        [this.domElement] = document.getElementsByClassName('keyboard__container');
         this.upCase = false;
         this.shiftPressed = false;
         this.capsPressed = false;
@@ -11,9 +13,7 @@ class Keyboard {
         this.altPressed = false;
         this.keyboardRows = [];
         for (let row = 0; row <= 4; row += 1) {
-            this.keyboardRows[row] = document.createElement('DIV');
-            this.keyboardRows[row].classList.add('keyboard__row');
-            this.domElement.appendChild(this.keyboardRows[row]);
+            this.keyboardRows[row] = createDomElement('DIV', null, 'keyboard__row', this.domElement);
         }
         this.targetOfKeyboard = document.getElementById('textarea');
         this.domElement.addEventListener('click', (event) => {

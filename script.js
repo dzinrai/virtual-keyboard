@@ -1,14 +1,10 @@
 import Keyboard from './keyboardClass.js';
+import createDomElement from './createDomElement.js';
 
 const body = document.getElementById('app');
-const textarea = document.createElement('TEXTAREA');
-textarea.classList.add('textarea');
-textarea.setAttribute('id', 'textarea');
-body.appendChild(textarea);
-const keyboardContainer = document.createElement('DIV');
-keyboardContainer.classList.add('keyboard__container');
-body.appendChild(keyboardContainer);
-const keyboard = new Keyboard('en', 'ru', {}, keyboardContainer);
+createDomElement('TEXTAREA', 'textarea', 'textarea', body);
+createDomElement('DIV', null, 'keyboard__container', body);
+const keyboard = new Keyboard('en', 'ru', {});
 //
 const btns = {};
 class Button {
@@ -17,19 +13,14 @@ class Button {
         this.value = value;
         this.altValue = altValue;
         //
-        this.domElement = document.createElement('BUTTON');
-        this.spanForValue = document.createElement('SPAN');
-        this.spanForShiftValue = document.createElement('SPAN');
-        this.domElement.appendChild(this.spanForValue);
-        this.domElement.appendChild(this.spanForShiftValue);
+        this.domElement = createDomElement('BUTTON', name, ['keyboard__button', 'button__'.concat(name.toLowerCase())]);
+        this.spanForValue = createDomElement('SPAN', null, null, this.domElement);
+        this.spanForShiftValue = createDomElement('SPAN', null, null, this.domElement);
         //
         this.inputTypeValue = true;
         this.workerType = false;
         this.multiLang = multiLang;
         this.digitType = Number.isInteger(value);
-        this.domElement.classList.add('keyboard__button');
-        this.domElement.classList.add('button__'.concat(name.toLowerCase()));
-        this.domElement.setAttribute('id', name);
         this.addToKeyboard(keyboard);
         this.keyBoard = keyboard;
         this.spanText = value;
@@ -144,12 +135,6 @@ btns.ArrowRight = new Button('ArrowRight', 'right');
 //
 keyboard.btnList = btns;
 keyboard.normalizeIt();
-const textContainer = document.createElement('DIV');
-textContainer.classList.add('info');
-const tooltip1 = document.createElement('SPAN');
-const tooltip2 = document.createElement('SPAN');
-tooltip1.innerHTML = 'Ctrl + Alt';
-tooltip2.innerHTML = 'Windows';
-textContainer.appendChild(tooltip1);
-textContainer.appendChild(tooltip2);
-body.appendChild(textContainer);
+const textContainer = createDomElement('DIV', null, 'info', body);
+createDomElement('SPAN', null, null, textContainer, 'Ctrl + Alt');
+createDomElement('SPAN', null, null, textContainer, 'Windows');
