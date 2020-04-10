@@ -1,4 +1,5 @@
 import Keyboard from './keyboardClass.js';
+import Button from './buttonClass.js';
 import createDomElement from './createDomElement.js';
 
 const body = document.getElementById('app');
@@ -7,76 +8,6 @@ createDomElement('DIV', null, 'keyboard__container', body);
 const keyboard = new Keyboard('en', 'ru', {});
 //
 const btns = {};
-class Button {
-    constructor(name, value, altValue, multiLang = false) {
-        this.name = name;
-        this.value = value;
-        this.altValue = altValue;
-        //
-        this.domElement = createDomElement('BUTTON', name, ['keyboard__button', 'button__'.concat(name.toLowerCase())]);
-        this.spanForValue = createDomElement('SPAN', null, null, this.domElement);
-        this.spanForShiftValue = createDomElement('SPAN', null, null, this.domElement);
-        //
-        this.inputTypeValue = true;
-        this.workerType = false;
-        this.multiLang = multiLang;
-        this.digitType = Number.isInteger(value);
-        this.addToKeyboard(keyboard);
-        this.keyBoard = keyboard;
-        this.spanText = value;
-        this.changeText();
-        if (name === 'ControlLeft' || name === 'ControlRight' || name === 'ShiftLeft' || name === 'ShiftRight' || name === 'AltLeft' || name === 'AltRight' || name === 'ArrowUp' || name === 'ArrowLeft' || name === 'ArrowRight' || name === 'ArrowDown' || name === 'CapsLock' || name === 'OSLeft') {
-            this.inputTypeValue = false;
-            this.workerType = true;
-        } else if (name === 'Space') {
-            this.value = ' ';
-            this.workerType = true;
-        } else if (name === 'Enter') {
-            this.value = '\n';
-            this.workerType = true;
-        } else if (name === 'Backspace') {
-            this.value = 'backspace';
-            this.workerType = true;
-        } else if (name === 'Delete') {
-            this.value = 'delete';
-            this.workerType = true;
-        } else if (name === 'Tab') {
-            this.value = '\t';
-            this.workerType = true;
-        }
-        if (this.workerType) this.domElement.classList.add('worker-type');
-        this.locked = false;
-    }
-
-    addToKeyboard(keyBoard) {
-        keyBoard.addBtn(this);
-    }
-
-    // View methods
-    changeText(up) {
-        const spanValue = this.spanForValue;
-        const spanShiftValue = this.spanForShiftValue;
-        if (Array.isArray(this.value) && this.multiLang) {
-            if (this.keyBoard.language === 'en') [spanValue.innerHTML, spanShiftValue.innerHTML] = this.value;
-            else if (this.keyBoard.language === 'ru') {
-                [spanValue.innerHTML, spanShiftValue.innerHTML] = this.altValue;
-                if (up) spanValue.innerHTML = String(spanValue.innerHTML).toUpperCase();
-            }
-        } else if (!Array.isArray(this.value) && this.multiLang) {
-            if (this.keyBoard.language === 'en') spanValue.innerHTML = up ? String(this.value).toUpperCase() : this.value;
-            else if (this.keyBoard.language === 'ru') spanValue.innerHTML = up ? String(this.altValue).toUpperCase() : this.altValue;
-        } else spanValue.innerHTML = this.spanText;
-    }
-
-    addClass(className) {
-        this.domElement.classList.add(className);
-    }
-
-    removeClass(className) {
-        this.domElement.classList.remove(className);
-    }
-}
-
 // Creating buttons
 btns.Backquote = new Button('Backquote', ['`', '~'], ['ё', ''], true);
 for (let i = 1; i <= 10; i += 1) {
@@ -133,8 +64,10 @@ btns.ArrowLeft = new Button('ArrowLeft', 'left');
 btns.ArrowDown = new Button('ArrowDown', 'down');
 btns.ArrowRight = new Button('ArrowRight', 'right');
 //
-keyboard.btnList = btns;
-keyboard.normalizeIt();
+keyboard.updateBtnList(btns);
+keyboard.updateBtnListArray().forEach((btn) => {
+    btn.addToKeyboard(keyboard);
+});
 const textContainer = createDomElement('DIV', null, 'info', body);
 createDomElement('SPAN', null, null, textContainer, 'Ctrl + Alt');
 createDomElement('SPAN', null, null, textContainer, 'Windows');

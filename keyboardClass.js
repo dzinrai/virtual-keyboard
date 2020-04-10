@@ -227,8 +227,13 @@ class Keyboard {
         this.targetOfKeyboard.value = this.valueApp('none', '▼');
     }
 
-    normalizeIt() {
+    updateBtnList(btnList) {
+        this.btnList = btnList;
+    }
+
+    updateBtnListArray() {
         this.buttonListArray = [...Object.values(this.btnList)];
+        return this.buttonListArray;
     }
 
     saveKeyboard() {
