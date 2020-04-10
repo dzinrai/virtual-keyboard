@@ -178,22 +178,24 @@ class Keyboard {
     }
 
     valueApp(mod, value_) {
-        let valueBefore = '';
+        const valueBefore = mod === 'backspace' ? this.valueSlice(-1) : this.valueSlice(0);
         let value = value_ === undefined ? '' : value_;
-        let valueAfter = '';
-        if (mod === 'backspace') valueBefore = ''.concat(this.targetOfKeyboard.value).slice(0, this.targetOfKeyboard.selectionStart - 1);
-        else valueBefore = ''.concat(this.targetOfKeyboard.value).slice(0, this.targetOfKeyboard.selectionStart);
-        if (mod === 'delete') valueAfter = ''.concat(this.targetOfKeyboard.value).slice(this.targetOfKeyboard.selectionEnd + 1);
-        else valueAfter = ''.concat(this.targetOfKeyboard.value).slice(this.targetOfKeyboard.selectionEnd);
+        const valueAfter = mod === 'delete' ? this.valueSlice(1, true) : this.valueSlice(0, true);
+        if (mod === 'backspace') this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
+        else if (mod === 'none') this.posIn += 1;
         value = valueBefore.concat(value).concat(valueAfter);
-        if (mod === 'none') {
-            this.posIn += 1;
-        } else if (mod === 'backspace') {
-            this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
-        }
         this.targetOfKeyboard.selectionStart = this.posIn;
         this.targetOfKeyboard.selectionEnd = this.posIn;
         return value;
+    }
+
+    valueSlice(step, toEnd = false) {
+        // step = -1/0/+1
+        const textAreaValue = this.targetOfKeyboard.value;
+        const { selectionStart } = this.targetOfKeyboard;
+        const { selectionEnd } = this.targetOfKeyboard;
+        if (toEnd) return textAreaValue.slice(selectionEnd + step);
+        return textAreaValue.slice(0, selectionStart + step);
     }
 
     changeLanguage() {
