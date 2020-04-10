@@ -201,22 +201,20 @@ class Keyboard {
         this.language = this.languageAlter;
         this.languageAlter = langTemp;
         this.saveKeyboard();
-        for (let i = 0; i < this.buttonListArray.length; i += 1) {
-            const btn = this.buttonListArray[i];
+        this.buttonListArray.forEach((btn) => {
             btn.changeText(this.upCase);
-        }
+        });
         this.ctrlPressed = false;
         this.altPressed = false;
     }
 
     changeCase(upperCase) {
         this.upCase = upperCase === undefined ? !this.upCase : upperCase;
-        for (let i = 0; i < this.buttonListArray.length; i += 1) {
-            const btn = this.buttonListArray[i];
-            if (this.buttonListArray[i].multiLang && !this.buttonListArray[i].digitType) {
+        this.buttonListArray.forEach((btn) => {
+            if (btn.multiLang && !btn.digitType) {
                 btn.changeText(this.upCase);
             }
-        }
+        });
     }
 
     upArrow() {
