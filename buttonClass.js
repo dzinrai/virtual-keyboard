@@ -1,7 +1,7 @@
 import createDomElement from './createDomElement.js';
 
 class Button {
-    constructor(name, value, altValue, multiLang = false) {
+    constructor(name, value, altValue, multiLang = false, inputType = true) {
         this.name = name;
         this.value = value;
         this.altValue = altValue;
@@ -10,30 +10,15 @@ class Button {
         this.spanForValue = createDomElement('SPAN', null, null, this.domElement);
         this.spanForShiftValue = createDomElement('SPAN', null, null, this.domElement);
         //
-        this.inputTypeValue = true;
+        this.inputTypeValue = inputType;
         this.workerType = false;
         this.multiLang = multiLang;
         this.digitType = Number.isInteger(value);
-        this.spanText = value;
-        if (name === 'ControlLeft' || name === 'ControlRight' || name === 'ShiftLeft' || name === 'ShiftRight' || name === 'AltLeft' || name === 'AltRight' || name === 'ArrowUp' || name === 'ArrowLeft' || name === 'ArrowRight' || name === 'ArrowDown' || name === 'CapsLock' || name === 'OSLeft') {
-            this.inputTypeValue = false;
-            this.workerType = true;
-        } else if (name === 'Space') {
-            this.value = ' ';
-            this.workerType = true;
-        } else if (name === 'Enter') {
-            this.value = '\n';
-            this.workerType = true;
-        } else if (name === 'Backspace') {
-            this.value = 'backspace';
-            this.workerType = true;
-        } else if (name === 'Delete') {
-            this.value = 'delete';
-            this.workerType = true;
-        } else if (name === 'Tab') {
-            this.value = '\t';
-            this.workerType = true;
-        }
+        const workers = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'CapsLock', 'OSLeft', 'Space', 'Enter', 'Backspace', 'Delete', 'Tab'];
+        workers.forEach((workerName) => {
+            if (name === workerName) this.workerType = true;
+        });
+        this.spanText = (this.workerType && this.inputTypeValue) ? name : value;
         if (this.workerType) this.domElement.classList.add('worker-type');
         this.locked = false;
     }
@@ -47,17 +32,15 @@ class Button {
     // View methods
     changeText(up) {
         const spanValue = this.spanForValue;
-        const spanShiftValue = this.spanForShiftValue;
-        if (Array.isArray(this.value) && this.multiLang) {
-            if (this.keyboard.language === 'en') [spanValue.innerHTML, spanShiftValue.innerHTML] = this.value;
-            else if (this.keyboard.language === 'ru') {
-                [spanValue.innerHTML, spanShiftValue.innerHTML] = this.altValue;
-                if (up) spanValue.innerHTML = String(spanValue.innerHTML).toUpperCase();
-            }
-        } else if (!Array.isArray(this.value) && this.multiLang) {
-            if (this.keyboard.language === 'en') spanValue.innerHTML = up ? String(this.value).toUpperCase() : this.value;
-            else if (this.keyboard.language === 'ru') spanValue.innerHTML = up ? String(this.altValue).toUpperCase() : this.altValue;
-        } else spanValue.innerHTML = this.spanText;
+        const spanShiftValue = Array.isArray(this.value) ? this.spanForShiftValue : undefined;
+        spanValue.innerHTML = this.spanText;
+        if (!this.multiLang) return;
+        if (this.keyboard.language === 'en') [spanValue.innerHTML] = this.value;
+        if (this.keyboard.language === 'ru') [spanValue.innerHTML] = this.altValue;
+        if (up) spanValue.innerHTML = String(spanValue.innerHTML).toUpperCase();
+        if (!spanShiftValue) return;
+        if (this.keyboard.language === 'en') [, spanShiftValue.innerHTML] = this.value;
+        if (this.keyboard.language === 'ru') [, spanShiftValue.innerHTML] = this.altValue;
     }
 
     addClass(className) {
