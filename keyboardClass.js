@@ -1,5 +1,3 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable indent */
 class Keyboard {
     constructor(lang, langAdd, buttonList, container) {
         this.language = localStorage.getItem('lang') !== null ? localStorage.getItem('lang') : lang;

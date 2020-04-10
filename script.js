@@ -1,6 +1,3 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable indent */
-/* eslint-disable import/extensions */
 import Keyboard from './keyboardClass.js';
 
 const body = document.getElementById('app');
