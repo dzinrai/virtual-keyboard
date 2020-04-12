@@ -39,19 +39,9 @@ class Keyboard {
                 let secondValue = null;
                 if (Array.isArray(value)) [value, secondValue] = value;
                 //
-                if (value === 'backspace') {
-                    this.targetOfKeyboard.value = this.valueApp('backspace');
-                    this.targetOfKeyboard.focus();
-                } else if (value === 'delete') {
-                    this.targetOfKeyboard.value = this.valueApp('delete');
-                    this.targetOfKeyboard.focus();
-                } else if (!this.upCase) {
-                    this.targetOfKeyboard.value = this.valueApp('none', String(value).toLowerCase());
-                } else if (this.keysPressed.shift && secondValue !== null) {
-                    this.targetOfKeyboard.value = this.valueApp('none', String(secondValue));
-                } else if (this.upCase) {
-                    this.targetOfKeyboard.value = this.valueApp('none', String(value).toUpperCase());
-                }
+                if (this.keysPressed.shift && secondValue) {
+                    this.targetOfKeyboard.value = this.valueApp(String(secondValue));
+                } else this.targetOfKeyboard.value = this.valueApp(value);
             } else if (keyCode === 'ArrowLeft') {
                 event.preventDefault();
                 this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
@@ -76,9 +66,10 @@ class Keyboard {
                 event.preventDefault();
                 this.keysPressed.alt = true;
             } else if (this.btnList[keyCode].name === 'CapsLock') {
-                this.keysPressed.caps = true;
+                this.keysPressed.caps = !this.keysPressed.caps;
                 this.changeCase();
             }
+            this.targetOfKeyboard.focus();
             if (this.keysPressed.ctrl && this.keysPressed.alt) this.changeLanguage();
             this.targetOfKeyboard.selectionStart = this.posIn;
             this.targetOfKeyboard.selectionEnd = this.posIn;
@@ -176,12 +167,13 @@ class Keyboard {
         el.dispatchEvent(this.eventObj);
     }
 
-    valueApp(mod, value_) {
-        const valueBefore = mod === 'backspace' ? this.valueSlice(-1) : this.valueSlice(0);
-        let value = value_ === undefined ? '' : value_;
-        const valueAfter = mod === 'delete' ? this.valueSlice(1, true) : this.valueSlice(0, true);
-        if (mod === 'backspace') this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
-        else if (mod === 'none') this.posIn += 1;
+    valueApp(value_) {
+        const valueBefore = value_ === 'backspace' ? this.valueSlice(-1) : this.valueSlice(0);
+        let value = (value_ === undefined || value_ === 'backspace' || value_ === 'delete') ? '' : value_;
+        const valueAfter = value_ === 'delete' ? this.valueSlice(1, true) : this.valueSlice(0, true);
+        if (value_ === 'backspace') this.posIn = this.posIn > 0 ? this.posIn - 1 : 0;
+        else if (value_ !== 'delete') this.posIn += 1;
+        value = this.upCase ? String(value).toUpperCase() : String(value).toLowerCase();
         value = valueBefore.concat(value).concat(valueAfter);
         this.targetOfKeyboard.selectionStart = this.posIn;
         this.targetOfKeyboard.selectionEnd = this.posIn;
