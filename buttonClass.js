@@ -20,7 +20,7 @@ class Button {
         });
         this.spanText = (this.workerType && this.inputTypeValue) ? name : value;
         if (this.workerType) this.domElement.classList.add('worker-type');
-        this.locked = false;
+        this.pressed = false;
     }
 
     addToKeyboard(keyboard_) {
