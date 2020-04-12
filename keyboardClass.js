@@ -14,7 +14,6 @@ class Keyboard {
         this.targetOfKeyboard = document.getElementById('textarea');
         document.addEventListener('keydown', (event) => {
             this.targetOfKeyboard.focus();
-            this.targetOfKeyboard.selectionStart = this.posIn;
             const keyCode = event.code ? event.code : event.keyCode;
             if (!this.btnList[keyCode]) return;
             if ((keyCode === 'ShiftLeft' || keyCode === 'ShiftRight') && !this.btnList[keyCode].pressed) {
@@ -34,8 +33,6 @@ class Keyboard {
                 if (shifted && secondValue) {
                     this.targetOfKeyboard.value = this.valueApp(secondValue);
                 } else this.targetOfKeyboard.value = this.valueApp(value);
-            } else if (keyCode === 'ArrowLeft' || keyCode === 'ArrowRight' || keyCode === 'ArrowUp' || keyCode === 'ArrowDown') {
-                this.arrowPress(event, keyCode);
             } else if (this.btnList[keyCode].name === 'CapsLock') {
                 this.changeCase();
             }
@@ -49,12 +46,16 @@ class Keyboard {
             this.targetOfKeyboard.selectionEnd = this.posIn;
             if (!this.btnList[keyCode].locked) this.btnList[keyCode].addClass('active');
         });
-        // shifr key mouse controls
+        // mouse controls
         this.domElement.addEventListener('mousedown', (event) => {
             let keyCode = null;
             if (event.target.tagName === 'BUTTON') keyCode = event.target.id;
             else if (event.target.tagName === 'SPAN') keyCode = event.target.parentElement.id;
             else return;
+            if (keyCode === 'ArrowLeft' || keyCode === 'ArrowRight' || keyCode === 'ArrowUp' || keyCode === 'ArrowDown') {
+                this.arrowPress(event, keyCode);
+                return;
+            }
             this.triggerKeyboardEvent(document, 'keydown', keyCode);
         });
         this.domElement.addEventListener('mouseup', (event) => {
@@ -77,6 +78,7 @@ class Keyboard {
                 this.changeCase();
             }
             this.btnList[keyCode].removeClass('active');
+            this.posIn = this.targetOfKeyboard.selectionStart;
         });
         this.targetOfKeyboard.addEventListener('click', () => {
             this.posIn = this.targetOfKeyboard.selectionStart;
@@ -162,11 +164,29 @@ class Keyboard {
             if (this.posIn < this.targetOfKeyboard.value.length) this.posIn += 1;
         }
         if (arrow === 'ArrowUp') {
-            this.targetOfKeyboard.value = this.valueApp('▲');
+            let pos = this.targetOfKeyboard.selectionEnd;
+            const prevLine = this.targetOfKeyboard.value.lastIndexOf('\n', pos);
+            const TwoBLine = this.targetOfKeyboard.value.lastIndexOf('\n', prevLine - 1);
+            if (prevLine === -1) return;
+            pos -= prevLine;
+            this.targetOfKeyboard.selectionStart = TwoBLine + pos;
+            this.targetOfKeyboard.selectionEnd = TwoBLine + pos;
+            this.posIn = this.targetOfKeyboard.selectionStart;
+            return;
         }
         if (arrow === 'ArrowDown') {
-            this.targetOfKeyboard.value = this.valueApp('▼');
+            let pos = this.targetOfKeyboard.selectionEnd;
+            const prevLine = this.targetOfKeyboard.value.lastIndexOf('\n', pos);
+            const nextLine = this.targetOfKeyboard.value.indexOf('\n', pos + 1);
+            if (nextLine === -1) return;
+            pos -= prevLine;
+            this.targetOfKeyboard.selectionStart = nextLine + pos;
+            this.targetOfKeyboard.selectionEnd = nextLine + pos;
+            this.posIn = this.targetOfKeyboard.selectionStart;
+            return;
         }
+        this.targetOfKeyboard.selectionStart = this.posIn;
+        this.targetOfKeyboard.selectionEnd = this.posIn;
     }
 
     updateBtnList(btnList) {
